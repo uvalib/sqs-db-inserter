@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 // time to wait for inbound messages before doing something else
 var waitTimeout = 5 * time.Second
 
-func worker(workerId int, dbproxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.QueueHandle, inbound <-chan awssqs.Message) {
+func worker(workerId int, dbProxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.QueueHandle, inbound <-chan awssqs.Message) {
 
 	// keep a list of the messages processed
 	queued := make([]awssqs.Message, 0, 1)
@@ -31,21 +32,26 @@ func worker(workerId int, dbproxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.Que
 		// we have an inbound message to process
 		if arrived == true {
 
-			// get the message identifier
-			//id, found := message.GetAttribute(awssqs.AttributeKeyRecordId)
-			//if found == false {
-			//	id = "unknown"
-			//	log.Printf("WARNING: cannot locate document id, using default")
-			//}
-
 			// add it to the queued list
 			queued = append(queued, message)
 
-			// process it
+			// decode the message and process it
+			var pl map[string]interface{}
+			err := json.Unmarshal(message.Payload, &pl)
+			if err == nil {
 
-			// delete it from the inbound queue
-			err := blockDelete(workerId, aws, queue, queued)
-			fatalIfError(err)
+				// insert into the database
+				err = dbProxy.Insert(pl)
+				if err == nil {
+					// delete it from the inbound queue
+					err = blockDelete(workerId, aws, queue, queued)
+					fatalIfError(err)
+				} else {
+					log.Printf("worker %d: ERROR message failed to insert (%s) (%s)", workerId, err.Error(), string(message.Payload))
+				}
+			} else {
+				log.Printf("worker %d: ERROR message failed to unmarshal (%s) (%s)", workerId, err.Error(), string(message.Payload))
+			}
 
 			// clear the queue
 			queued = queued[:0]
@@ -67,7 +73,7 @@ func blockDelete(workerId int, aws awssqs.AWS_SQS, queue awssqs.QueueHandle, mes
 	if err == awssqs.ErrOneOrMoreOperationsUnsuccessful {
 		for ix, op := range opStatus {
 			if op == false {
-				log.Printf("worker %d: ERROR message %d failed to delete", workerId, ix)
+				log.Printf("worker %d: WARNING message %d failed to delete", workerId, ix)
 			}
 		}
 	}

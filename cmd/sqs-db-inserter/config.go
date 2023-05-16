@@ -23,7 +23,7 @@ type ServiceConfig struct {
 
 	// database insertion attributes
 	DbInsertStatement string // the database insert statement
-	DbInsertMap       string // the database field map
+	DbInsertFields    string // the database field names
 }
 
 func ensureSet(env string) string {
@@ -81,8 +81,8 @@ func LoadConfiguration() *ServiceConfig {
 	cfg.DbName = ensureSetAndNonEmpty("SQS_DB_INSERTER_DB_NAME")
 
 	// database insertion attributes
-	cfg.DbInsertStatement = ensureSetAndNonEmpty("SQS_DB_INSERTER_DB_INSERT")
-	cfg.DbInsertMap = ensureSetAndNonEmpty("SQS_DB_INSERTER_DB_INSERT_MAP")
+	cfg.DbInsertStatement = ensureSetAndNonEmpty("SQS_DB_INSERTER_DB_INSERT_STATEMENT")
+	cfg.DbInsertFields = ensureSetAndNonEmpty("SQS_DB_INSERTER_DB_INSERT_FIELDS")
 
 	log.Printf("[config] InQueueName       = [%s]", cfg.InQueueName)
 	log.Printf("[config] MessageBucketName = [%s]", cfg.MessageBucketName)
@@ -98,7 +98,7 @@ func LoadConfiguration() *ServiceConfig {
 
 	// database insertion attributes
 	log.Printf("[config] DbInsertStatement = [%s]", cfg.DbInsertStatement)
-	log.Printf("[config] DbInsertMap       = [%s]", cfg.DbInsertMap)
+	log.Printf("[config] DbInsertFields    = [%s]", cfg.DbInsertFields)
 
 	return &cfg
 }
