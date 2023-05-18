@@ -22,7 +22,6 @@ type DbProxy struct {
 
 type DbField struct {
 	dbFieldName string
-	dbFieldType string
 }
 
 // NewDbProxy - the factory
@@ -32,13 +31,7 @@ func NewDbProxy(cfg ServiceConfig) *DbProxy {
 	fmapper := strings.Split(cfg.DbInsertFields, ",")
 	fields := make([]DbField, len(fmapper))
 	for ix, f := range fmapper {
-		fs := strings.Split(f, "/")
-		if len(fs) == 2 {
-			fields[ix].dbFieldName = fs[0]
-			fields[ix].dbFieldType = fs[1]
-		} else {
-			fatalIfError(fmt.Errorf("insert field configuration is incomplete"))
-		}
+		fields[ix].dbFieldName = f
 	}
 
 	if len(fields) > maxInsertFields {
