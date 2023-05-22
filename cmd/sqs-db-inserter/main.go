@@ -33,10 +33,13 @@ func main() {
 	// create the record channel
 	inboundMessageChan := make(chan awssqs.Message, cfg.WorkerQueueSize)
 
+	// create counter object
+	counter := Counter{}
+
 	// start workers here
 	log.Printf("[main] starting workers...")
 	for w := 1; w <= cfg.Workers; w++ {
-		go worker(w, dbProxy, sqs, inQueueHandle, inboundMessageChan)
+		go worker(w, dbProxy, sqs, inQueueHandle, inboundMessageChan, &counter)
 	}
 
 	log.Printf("[main] starting main polling loop...")
@@ -66,6 +69,9 @@ func main() {
 
 		} else {
 			log.Printf("[main] no messages available")
+			s, e, i := counter.Get()
+			log.Printf("[main] processed %d (success: %d, error: %d, ignored: %d)",
+				s+e+i, s, e, i)
 		}
 	}
 }

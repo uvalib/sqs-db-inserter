@@ -11,7 +11,7 @@ import (
 // time to wait for inbound messages before doing something else
 var waitTimeout = 5 * time.Second
 
-func worker(workerId int, dbProxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.QueueHandle, inbound <-chan awssqs.Message) {
+func worker(workerId int, dbProxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.QueueHandle, inbound <-chan awssqs.Message, counter *Counter) {
 
 	// keep a list of the messages processed
 	queued := make([]awssqs.Message, 0, 1)
@@ -43,20 +43,35 @@ func worker(workerId int, dbProxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.Que
 			err := json.Unmarshal(message.Payload, &pl)
 			if err == nil {
 
-				// insert into the database
-				err = dbProxy.Insert(pl)
+				// should we ignore this message
+				ignore := dbProxy.WillIgnore(pl)
+
+				// un-ignored messages go to the database
+				if ignore == false {
+					// insert into the database
+					err = dbProxy.Insert(pl)
+				}
+
 				if err == nil {
 					// delete it from the inbound queue
 					err = blockDelete(workerId, aws, queue, queued)
 					fatalIfError(err)
 
-					duration := time.Since(start)
-					log.Printf("INFO: worker %d: processed message in %d milliseconds", workerId, duration.Milliseconds())
+					if ignore == false {
+						duration := time.Since(start)
+						log.Printf("INFO: worker %d: processed message in %d milliseconds", workerId, duration.Milliseconds())
+						counter.AddSuccess(1)
+					} else {
+						log.Printf("INFO: worker %d: ignored message", workerId)
+						counter.AddIgnore(1)
+					}
 				} else {
 					log.Printf("worker %d: ERROR message failed to insert (%s) (%s)", workerId, err.Error(), string(message.Payload))
+					counter.AddError(1)
 				}
 			} else {
 				log.Printf("worker %d: ERROR message failed to unmarshal (%s) (%s)", workerId, err.Error(), string(message.Payload))
+				counter.AddError(1)
 			}
 
 			// clear the queue
