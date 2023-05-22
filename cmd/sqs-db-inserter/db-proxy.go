@@ -90,10 +90,6 @@ func (p *DbProxy) Insert(rec map[string]interface{}) error {
 	return err
 }
 
-func (p *DbProxy) WillIgnore(rec map[string]interface{}) bool {
-	return false
-}
-
 //
 // end of file
 //

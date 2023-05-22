@@ -43,28 +43,16 @@ func worker(workerId int, dbProxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.Que
 			err := json.Unmarshal(message.Payload, &pl)
 			if err == nil {
 
-				// should we ignore this message
-				ignore := dbProxy.WillIgnore(pl)
-
-				// un-ignored messages go to the database
-				if ignore == false {
-					// insert into the database
-					err = dbProxy.Insert(pl)
-				}
-
+				// insert into the database
+				err = dbProxy.Insert(pl)
 				if err == nil {
 					// delete it from the inbound queue
 					err = blockDelete(workerId, aws, queue, queued)
 					fatalIfError(err)
 
-					if ignore == false {
-						duration := time.Since(start)
-						log.Printf("INFO: worker %d: processed message in %d milliseconds", workerId, duration.Milliseconds())
-						counter.AddSuccess(1)
-					} else {
-						log.Printf("INFO: worker %d: ignored message", workerId)
-						counter.AddIgnore(1)
-					}
+					duration := time.Since(start)
+					log.Printf("INFO: worker %d: processed message in %d milliseconds", workerId, duration.Milliseconds())
+					counter.AddSuccess(1)
 				} else {
 					log.Printf("worker %d: ERROR message failed to insert (%s) (%s)", workerId, err.Error(), string(message.Payload))
 					counter.AddError(1)

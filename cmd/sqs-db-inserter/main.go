@@ -68,10 +68,10 @@ func main() {
 			}
 
 		} else {
-			log.Printf("[main] no messages available")
-			s, e, i := counter.Get()
-			log.Printf("[main] processed %d (success: %d, error: %d, ignored: %d)",
-				s+e+i, s, e, i)
+			log.Printf("[main] no new messages available")
+			s, e := counter.Get()
+			log.Printf("[main] since startup, processed %d messages (success: %d, error: %d)",
+				s+e, s, e)
 		}
 	}
 }
