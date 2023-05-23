@@ -12,7 +12,7 @@ import (
 var dbTimeout = 30
 
 // maximum fields supported
-var maxInsertFields = 5
+var maxInsertFields = 10
 
 type DbProxy struct {
 	handle *sql.DB
@@ -58,7 +58,10 @@ func (p *DbProxy) Insert(rec map[string]interface{}) error {
 	// if you add more cases here to support more insert fields, adjust
 	// maxInsertFields above as necessary
 	//
-	var err error
+	err := p.ensureFieldsExist(rec)
+	if err != nil {
+		return err
+	}
 	switch len(p.fields) {
 	case 1:
 		f1 := rec[p.fields[0].dbFieldName]
@@ -85,9 +88,72 @@ func (p *DbProxy) Insert(rec map[string]interface{}) error {
 		f4 := rec[p.fields[3].dbFieldName]
 		f5 := rec[p.fields[4].dbFieldName]
 		_, err = p.handle.Exec(p.insert, f1, f2, f3, f4, f5)
+	case 6:
+		f1 := rec[p.fields[0].dbFieldName]
+		f2 := rec[p.fields[1].dbFieldName]
+		f3 := rec[p.fields[2].dbFieldName]
+		f4 := rec[p.fields[3].dbFieldName]
+		f5 := rec[p.fields[4].dbFieldName]
+		f6 := rec[p.fields[5].dbFieldName]
+		_, err = p.handle.Exec(p.insert, f1, f2, f3, f4, f5, f6)
+	case 7:
+		f1 := rec[p.fields[0].dbFieldName]
+		f2 := rec[p.fields[1].dbFieldName]
+		f3 := rec[p.fields[2].dbFieldName]
+		f4 := rec[p.fields[3].dbFieldName]
+		f5 := rec[p.fields[4].dbFieldName]
+		f6 := rec[p.fields[5].dbFieldName]
+		f7 := rec[p.fields[6].dbFieldName]
+		_, err = p.handle.Exec(p.insert, f1, f2, f3, f4, f5, f6, f7)
+	case 8:
+		f1 := rec[p.fields[0].dbFieldName]
+		f2 := rec[p.fields[1].dbFieldName]
+		f3 := rec[p.fields[2].dbFieldName]
+		f4 := rec[p.fields[3].dbFieldName]
+		f5 := rec[p.fields[4].dbFieldName]
+		f6 := rec[p.fields[5].dbFieldName]
+		f7 := rec[p.fields[6].dbFieldName]
+		f8 := rec[p.fields[7].dbFieldName]
+		_, err = p.handle.Exec(p.insert, f1, f2, f3, f4, f5, f6, f7, f8)
+	case 9:
+		f1 := rec[p.fields[0].dbFieldName]
+		f2 := rec[p.fields[1].dbFieldName]
+		f3 := rec[p.fields[2].dbFieldName]
+		f4 := rec[p.fields[3].dbFieldName]
+		f5 := rec[p.fields[4].dbFieldName]
+		f6 := rec[p.fields[5].dbFieldName]
+		f7 := rec[p.fields[6].dbFieldName]
+		f8 := rec[p.fields[7].dbFieldName]
+		f9 := rec[p.fields[8].dbFieldName]
+		_, err = p.handle.Exec(p.insert, f1, f2, f3, f4, f5, f6, f7, f8, f9)
+	case 10:
+		f1 := rec[p.fields[0].dbFieldName]
+		f2 := rec[p.fields[1].dbFieldName]
+		f3 := rec[p.fields[2].dbFieldName]
+		f4 := rec[p.fields[3].dbFieldName]
+		f5 := rec[p.fields[4].dbFieldName]
+		f6 := rec[p.fields[5].dbFieldName]
+		f7 := rec[p.fields[6].dbFieldName]
+		f8 := rec[p.fields[7].dbFieldName]
+		f9 := rec[p.fields[8].dbFieldName]
+		f10 := rec[p.fields[9].dbFieldName]
+		_, err = p.handle.Exec(p.insert, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10)
 	}
 
 	return err
+}
+
+func (p *DbProxy) ensureFieldsExist(rec map[string]interface{}) error {
+
+	// iterate through all the field definitions to ensure they appear in the map
+	for _, f := range p.fields {
+		_, exists := rec[f.dbFieldName]
+		if exists == false {
+			return fmt.Errorf("field '%s' does not appear in the message", f.dbFieldName)
+		}
+	}
+
+	return nil
 }
 
 //
