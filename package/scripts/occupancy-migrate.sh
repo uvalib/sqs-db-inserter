@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# run any necessary migrations
+# run any necessary occupancy-migrations
 #
 
 if [ -z "$DB_HOST" ]; then
@@ -28,8 +28,8 @@ if [ -z "$DB_NAME" ]; then
    exit 1
 fi
 
-# run the migrations
-bin/migrate -path db/migrations -verbose -database postgres://$DB_USER:$DB_PASSWD@$DB_HOST:$DB_PORT/$DB_NAME up
+# run the occupancy-migrations
+bin/migrate -path db/occupancy-migrations -verbose -database "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" up
 
 # return the status
 exit $?

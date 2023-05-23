@@ -29,7 +29,7 @@ ENV APP_HOME /sqs-db-inserter
 WORKDIR $APP_HOME
 
 # Create necessary directories
-RUN mkdir -p $APP_HOME $APP_HOME/bin $APP_HOME/scripts $APP_HOME/db/migrations
+RUN mkdir -p $APP_HOME $APP_HOME/bin $APP_HOME/scripts $APP_HOME/db/occupancy-migrations
 RUN chown -R webservice $APP_HOME && chgrp -R webservice $APP_HOME
 
 # add the migrate tool
@@ -41,12 +41,12 @@ CMD scripts/entry.sh
 # Move in necessary assets
 COPY package/data/container_bash_profile /home/webservice/.profile
 COPY package/scripts/entry.sh $APP_HOME/scripts/entry.sh
-COPY package/scripts/migrate.sh $APP_HOME/scripts/migrate.sh
-#COPY db/migrations/*.sql $APP_HOME/db/migrations/
+COPY package/scripts/occupancy-migrate.sh $APP_HOME/scripts/occupancy-migrate.sh
+#COPY db/occupancy-migrations/*.sql $APP_HOME/db/occupancy-migrations/
 COPY --from=builder /build/bin/sqs-db-inserter.linux $APP_HOME/bin/sqs-db-inserter
 
 # Ensure permissions are correct
-RUN chown webservice:webservice /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/sqs-db-inserter $APP_HOME/bin/migrate && chmod 755 /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/sqs-db-inserter $APP_HOME/bin/migrate
+RUN chown webservice:webservice /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/occupancy-migrate.sh $APP_HOME/bin/sqs-db-inserter $APP_HOME/bin/migrate && chmod 755 /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/occupancy-migrate.sh $APP_HOME/bin/sqs-db-inserter $APP_HOME/bin/migrate
 RUN chown -R webservice:webservice $APP_HOME/db && chmod -R 755 $APP_HOME/db
 
 # Add the build tag
