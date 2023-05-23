@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // ServiceConfig defines the service configuration parameters
@@ -81,6 +82,9 @@ func LoadConfiguration() *ServiceConfig {
 	// database insertion attributes
 	cfg.DbInsertStatement = ensureSetAndNonEmpty("SQS_DB_INSERTER_DB_INSERT_STATEMENT")
 	cfg.DbInsertFields = ensureSetAndNonEmpty("SQS_DB_INSERTER_DB_INSERT_FIELDS")
+
+	// handle a special case for AWS deployment
+	cfg.DbInsertStatement = strings.Replace(cfg.DbInsertStatement, "$$", "$", -1)
 
 	log.Printf("[config] InQueueName       = [%s]", cfg.InQueueName)
 	log.Printf("[config] MessageBucketName = [%s]", cfg.MessageBucketName)
