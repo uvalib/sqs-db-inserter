@@ -63,8 +63,6 @@ func envToInt(env string) int {
 // and return a pointer to it. Any failures are fatal.
 func LoadConfiguration() *ServiceConfig {
 
-	log.Printf("Loading configuration...")
-
 	var cfg ServiceConfig
 
 	cfg.InQueueName = ensureSetAndNonEmpty("SQS_DB_INSERTER_IN_QUEUE")

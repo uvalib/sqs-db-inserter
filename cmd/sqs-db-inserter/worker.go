@@ -51,14 +51,14 @@ func worker(workerId int, dbProxy *DbProxy, aws awssqs.AWS_SQS, queue awssqs.Que
 					fatalIfError(err)
 
 					duration := time.Since(start)
-					log.Printf("INFO: worker %d: processed message in %d milliseconds", workerId, duration.Milliseconds())
+					log.Printf("INFO: [worker %d] processed message in %d milliseconds", workerId, duration.Milliseconds())
 					counter.AddSuccess(1)
 				} else {
-					log.Printf("worker %d: ERROR message failed to insert (%s) (%s)", workerId, err.Error(), string(message.Payload))
+					log.Printf("ERROR: [worker %d] message failed to insert (%s) (%s)", workerId, err.Error(), string(message.Payload))
 					counter.AddError(1)
 				}
 			} else {
-				log.Printf("worker %d: ERROR message failed to unmarshal (%s) (%s)", workerId, err.Error(), string(message.Payload))
+				log.Printf("ERROR: [worker %d] message failed to unmarshal (%s) (%s)", workerId, err.Error(), string(message.Payload))
 				counter.AddError(1)
 			}
 
@@ -82,7 +82,7 @@ func blockDelete(workerId int, aws awssqs.AWS_SQS, queue awssqs.QueueHandle, mes
 	if err == awssqs.ErrOneOrMoreOperationsUnsuccessful {
 		for ix, op := range opStatus {
 			if op == false {
-				log.Printf("worker %d: WARNING message %d failed to delete", workerId, ix)
+				log.Printf("WARNING: [worker %d]  message %d failed to delete", workerId, ix)
 			}
 		}
 	}

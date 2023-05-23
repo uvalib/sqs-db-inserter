@@ -61,8 +61,6 @@ func main() {
 		sz := len(messages)
 		if sz != 0 {
 
-			//log.Printf( "Received %d messages", sz )
-
 			for _, m := range messages {
 				inboundMessageChan <- m
 			}
