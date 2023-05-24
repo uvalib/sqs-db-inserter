@@ -42,7 +42,7 @@ CMD scripts/entry.sh
 COPY package/data/container_bash_profile /home/webservice/.profile
 COPY package/scripts/entry.sh $APP_HOME/scripts/entry.sh
 COPY package/scripts/occupancy-migrate.sh $APP_HOME/scripts/occupancy-migrate.sh
-#COPY db/occupancy-migrations/*.sql $APP_HOME/db/occupancy-migrations/
+COPY db/occupancy-migrations/*.sql $APP_HOME/db/occupancy-migrations/
 COPY --from=builder /build/bin/sqs-db-inserter.linux $APP_HOME/bin/sqs-db-inserter
 
 # Ensure permissions are correct
