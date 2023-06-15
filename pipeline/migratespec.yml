@@ -16,16 +16,16 @@ phases:
 
   pre_build:
     commands:
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $CONTAINER_REGISTRY
-      - latest_build=$(aws --region=$AWS_REGION ssm get-parameter --name /containers/$CONTAINER_IMAGE/latest | grep "Value" | awk -F\" '{print $4}')
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${CONTAINER_REGISTRY}
+      - latest_build=$(aws --region=${AWS_REGION} ssm get-parameter --name /containers/${CONTAINER_IMAGE}/latest | grep "Value" | awk -F\" '{print $4}')
 
   build:
     commands:
       - DOCKER_ENTRY="--entrypoint /sqs-db-inserter/scripts/occupancy-migrate.sh"
-      - DOCKER_ENV="-e DB_HOST=$DBHOST -e DB_PORT=$DBPORT -e DB_NAME=$DBNAME -e DB_USER=$DBUSER -e DB_PASSWD=$DBPASSWD"
-      - DOCKER_IMAGE="$CONTAINER_REGISTRY/$CONTAINER_IMAGE:$latest_build"
-      - docker pull $DOCKER_IMAGE || docker pull $DOCKER_IMAGE || docker pull $DOCKER_IMAGE
-      - docker run $DOCKER_ENTRY $DOCKER_ENV $DOCKER_IMAGE
+      - DOCKER_ENV="-e DB_HOST=${DBHOST} -e DB_PORT=${DBPORT} -e DB_NAME=${DBNAME} -e DB_USER=${DBUSER} -e DB_PASSWD=${DBPASSWD}"
+      - DOCKER_IMAGE="${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}:${latest_build}"
+      - docker pull ${DOCKER_IMAGE} || docker pull ${DOCKER_IMAGE} || docker pull ${DOCKER_IMAGE}
+      - docker run ${DOCKER_ENTRY} ${DOCKER_ENV} ${DOCKER_IMAGE}
 
 #  post_build:
 #    commands:
