@@ -39,7 +39,7 @@ func NewDbProxy(cfg ServiceConfig) *DbProxy {
 	}
 
 	// connect to database
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d connect_timeout=%d sslmode=disable",
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d connect_timeout=%d",
 		cfg.DbUser, cfg.DbPass, cfg.DbName, cfg.DbHost, cfg.DbPort, dbTimeout)
 
 	db, err := sql.Open("postgres", connStr)
