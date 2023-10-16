@@ -29,7 +29,7 @@ if [ -z "$DB_NAME" ]; then
 fi
 
 # run the occupancy-migrations
-bin/migrate -path db/occupancy-migrations -verbose -database "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" up
+bin/migrate -path db/occupancy-migrations -verbose -database "mysql://${DB_USER}:${DB_PASSWD}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}" up
 
 # return the status
 exit $?
