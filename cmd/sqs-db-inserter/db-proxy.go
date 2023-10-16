@@ -4,8 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
-	_ "github.com/lib/pq"
+	// postgres
+	//_ "github.com/lib/pq"
+
+	// mysql
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // database timeout
@@ -38,12 +43,25 @@ func NewDbProxy(cfg ServiceConfig) *DbProxy {
 		fatalIfError(fmt.Errorf("unsupported number of insert fields (max is %d)", maxInsertFields))
 	}
 
-	// connect to database
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d connect_timeout=%d",
-		cfg.DbUser, cfg.DbPass, cfg.DbName, cfg.DbHost, cfg.DbPort, dbTimeout)
+	// connect to database (postgres)
+	//connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d connect_timeout=%d",
+	//	cfg.DbUser, cfg.DbPass, cfg.DbName, cfg.DbHost, cfg.DbPort, dbTimeout)
+	//db, err := sql.Open("postgres", connStr)
 
-	db, err := sql.Open("postgres", connStr)
+	// connect to database (mysql)
+	connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?timeout=%ds&parseTime=true",
+		cfg.DbUser, cfg.DbPass, cfg.DbHost, cfg.DbName, dbTimeout)
+	db, err := sql.Open("mysql", connStr)
+
 	fatalIfError(err)
+
+	err = db.Ping()
+	fatalIfError(err)
+
+	// specifically for mysql
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(cfg.Workers)
+	db.SetMaxIdleConns(cfg.Workers)
 
 	return &DbProxy{
 		handle: db,
