@@ -1,0 +1,14 @@
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:31:21";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:31:54";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:31:75";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:32:c6";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:61";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:76";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:79";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:7b";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:8c";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:90";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:94";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:9e";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:59:d4";
+DELETE FROM cameras where serial_no = "b8:a4:4f:5d:5a:00";
